@@ -11,6 +11,13 @@
 							<?php dynamic_sidebar( 'footer-ads' ); ?>
 						</div><!--/#footer-ads-->
 						<?php endif; ?>
+
+						//Addition of Footer Menu
+						<?php if ( has_nav_menu('footer') ): ?>
+   						 <div id="wrap-nav-footer" class="wrap-nav">
+     						   <?php wp_nav_menu(array('theme_location' => 'footer', 'menu_id' => 'nav-footer', 'fallback_cb' => false)); ?>
+  						  </div>
+						<?php endif; ?>
 							
 						<?php // footer widgets
 							$total = 4;

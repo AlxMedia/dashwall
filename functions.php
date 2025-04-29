@@ -86,6 +86,7 @@ if ( ! function_exists( 'dashwall_setup' ) ) {
 		register_nav_menus( array(
 			'mobile' 	=> esc_html__( 'Mobile', 'dashwall' ),
 			'header' 	=> esc_html__( 'Header', 'dashwall' ),
+			'footer' 	=> esc_html__( 'Footer', 'dashwall' ),
 		) );
 	}
 	
@@ -439,26 +440,6 @@ if ( ! function_exists( 'dashwall_related_posts' ) ) {
 	
 }
 
-
-/*  Get featured post ids
-/* ------------------------------------ */
-if ( ! function_exists( 'dashwall_get_featured_post_ids' ) ) {
-
-	function dashwall_get_featured_post_ids() {
-		$args = array(
-			'category'		=> absint( get_theme_mod('featured-category','') ),
-			'numberposts'	=> absint( get_theme_mod('featured-posts-count','4')),
-		);
-		$posts = get_posts($args);
-		if ( !$posts ) return false;
-		foreach ( $posts as $post )
-			$ids[] = $post->ID;
-		return $ids;
-	}
-	
-}
-
-
 /* ------------------------------------------------------------------------- *
  *  Filters
 /* ------------------------------------------------------------------------- */
@@ -522,29 +503,76 @@ add_filter( 'excerpt_length', 'dashwall_excerpt_length', 999 );
  *  Actions
 /* ------------------------------------------------------------------------- */	
 
-/*  Include or exclude featured articles in loop
+/*  Include or exclude featured articles in main blog loop
 /* ------------------------------------ */
-if ( ! function_exists( 'dashwall_pre_get_posts' ) ) {
+if ( ! function_exists( 'dashwall_exclude_featured_category' ) ) {
 
-	function dashwall_pre_get_posts( $query ) {
-		// Are we on main query ?
-		if ( !$query->is_main_query() ) return;
-		if ( $query->is_home() ) {
+    function dashwall_exclude_featured_category( $query ) {
+        // Ensure we are modifying the main query and on the blog page
+        if ( ! is_admin() && $query->is_main_query() && is_home() ) {
 
-			// Featured posts enabled
-			if ( get_theme_mod('featured-posts-count','4') != '0' ) {
-				// Get featured post ids
-				$featured_post_ids = dashwall_get_featured_post_ids();
-				// Exclude posts
-				if ( $featured_post_ids && get_theme_mod('featured-posts-include','off') =='on' )
-					$query->set('post__not_in', $featured_post_ids);
-			}
-		}
-	}
-	
+            // Get the value of the 'featured-posts-category' setting (could be an ID or slug)
+            $featured_cat = get_theme_mod( 'featured-posts-category', '' );
+
+            // If the category ID is empty, try to get it from the category slug
+            if ( ! empty( $featured_cat ) ) {
+
+                // Check if the value is a numeric ID (if it's a category ID)
+                if ( is_numeric( $featured_cat ) ) {
+                    $cat_id = intval( $featured_cat );
+                } else {
+                    // If it's a slug, fetch the category by slug
+                    $category = get_category_by_slug( $featured_cat );
+                    if ( $category ) {
+                        $cat_id = $category->term_id;
+                    }
+                }
+
+                // If we have a valid category ID
+                if ( isset( $cat_id ) && $cat_id ) {
+                    // Exclude posts from this category by setting the 'cat' parameter with a negative ID
+                    $query->set( 'cat', '-' . $cat_id );
+                }
+            }
+        }
+    }
+
 }
-add_action( 'pre_get_posts', 'dashwall_pre_get_posts' );
+add_action( 'pre_get_posts', 'dashwall_exclude_featured_category' );
 
+
+/*  Include or exclude highlight articles in main blog loop
+/* ------------------------------------ */
+function dashwall_exclude_highlight_category( $query ) {
+    // Ensure we are modifying the main query and on the blog page
+    if ( ! is_admin() && $query->is_main_query() && is_home() ) {
+
+        // Get the value of the 'highlight-category' setting (could be an ID or slug)
+        $highlight_cat = get_theme_mod( 'highlight-category', '' );
+
+        // If the category ID is empty, try to get it from the category slug
+        if ( ! empty( $highlight_cat ) ) {
+
+            // Check if the value is a numeric ID (if it's a category ID)
+            if ( is_numeric( $highlight_cat ) ) {
+                $cat_id = intval( $highlight_cat );
+            } else {
+                // If it's a slug, fetch the category by slug
+                $category = get_category_by_slug( $highlight_cat );
+                if ( $category ) {
+                    $cat_id = $category->term_id;
+                }
+            }
+
+            // If we have a valid category ID
+            if ( isset( $cat_id ) && $cat_id ) {
+                // Exclude posts from this category by setting the 'cat' parameter with a negative ID
+                $query->set( 'cat', '-' . $cat_id );
+            }
+        }
+    }
+}
+add_action( 'pre_get_posts', 'dashwall_exclude_highlight_category' );
 
 /*  Script for no-js / js class
 /* ------------------------------------ */
@@ -646,3 +674,58 @@ function dashwall_kirki_config( $config ) {
 	return $config;
 }
 add_filter( 'kirki/config', 'dashwall_kirki_config', 999 );
+
+// Fetch Pages for the Select Control
+function get_page_choices() {
+    $pages = get_pages( array(
+        'post_status' => 'publish',
+        'post_type'   => 'page',
+    ) );
+
+    $choices = array();
+    $choices[''] = esc_html__( 'Select a Page', 'dashwall' ); // Default option
+
+    foreach ( $pages as $page ) {
+        $choices[$page->ID] = $page->post_title;
+    }
+
+    return $choices;
+}
+// Register Dynamic CSS Styles for the Featured and Highlights Section Buttons and add CSS to header
+function dashwall_dynamic_button_styles() {
+	// Get theme mods for featured section button
+	$button_text_color = get_theme_mod( 'featured-button-text-color', '#ffffff' );
+	$gradient_color1 = get_theme_mod( 'featured-button-gradient-color1', '#ff7e5f' );
+	$gradient_color2 = get_theme_mod( 'featured-button-gradient-color2', '#feb47b' );
+	$hover_text_color = get_theme_mod( 'featured-button-hover-text-color', '#99003d' );
+	// Get theme mods for highlights section button
+	$highlights_button_text_color = get_theme_mod( 'highlights-button-text-color', '#ffffff' );
+	$highlights_gradient_color_top = get_theme_mod( 'highlights-button-gradient-color-top', '#ff7e5f' );
+	$highlights_gradient_color_bottom = get_theme_mod( 'highlights-button-gradient-color-bottom', '#feb47b' );
+	$highlights_hover_shadow_color = get_theme_mod( 'highlights-button-hover-shadow-color', '#99003d' );
+	?>
+	<style type="text/css">
+		.featured-button {
+			color: <?php echo esc_attr( $button_text_color ); ?>;
+			background: linear-gradient(135deg, <?php echo esc_attr( $gradient_color1 ); ?>, <?php echo esc_attr( $gradient_color2 ); ?>);
+			border: 3px solid <?php echo esc_attr( $button_text_color ); ?>;
+		}
+		.featured-button:hover {
+			color: <?php echo esc_attr( $hover_text_color ); ?>;
+			background: linear-gradient(135deg, <?php echo esc_attr( $gradient_color2 ); ?>, <?php echo esc_attr( $gradient_color1 ); ?>);
+			border-color: <?php echo esc_attr( $hover_text_color ); ?>;
+		}
+		.featured-button::before {
+			background: linear-gradient(135deg, <?php echo esc_attr( $gradient_color1 ); ?>, <?php echo esc_attr( $gradient_color2 ); ?>);
+		}
+		.highlight-button {
+  			color: <?php echo esc_attr( $highlights_button_text_color ); ?>; /* Ashoka Chakra Blue */
+  			background: linear-gradient(to bottom, <?php echo esc_attr( $highlights_gradient_color_top ); ?>, #ffffff, <?php echo esc_attr( $highlights_gradient_color_top ); ?>);}
+		.highlight-button:hover {
+			color: <?php echo esc_attr( $highlights_button_text_color ); ?>; /* Ashoka Chakra Blue */
+  			box-shadow: 0 0 25px 10px <?php echo esc_attr( $highlights_hover_shadow_color ); ?>; /* Golden Glow on hover */
+		}
+	</style>
+	<?php
+}
+add_action( 'wp_head', 'dashwall_dynamic_button_styles' );

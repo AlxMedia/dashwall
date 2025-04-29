@@ -16,7 +16,7 @@ Kirki::add_section( 'morelink', array(
 	'title'       => esc_html__( 'AlxMedia', 'dashwall' ),
 	'type'        => 'link',
 	'button_text' => esc_html__( 'View More Themes', 'dashwall' ),
-	'button_url'  => 'https://agnarson.com/wpthemes/',
+	'button_url'  => 'http://alx.media/themes/',
 	'priority'    => 13,
 ) );
 Kirki::add_section( 'reviewlink', array(
@@ -94,12 +94,12 @@ Kirki::add_field( 'dashwall_theme', array(
 	'section'		=> 'general',
 	'default'		=> 'on',
 ) );
-// Blog: Featured Posts Include
+// Blog: Featured Posts Include/Exclude
 Kirki::add_field( 'dashwall_theme', array(
 	'type'			=> 'switch',
 	'settings'		=> 'featured-posts-include',
 	'label'			=> esc_html__( 'Featured Posts Exclude', 'dashwall' ),
-	'description'	=> esc_html__( 'Exclude featured posts from the content below', 'dashwall' ),
+	'description'	=> esc_html__( 'Exclude featured posts from the main blog content', 'dashwall' ),
 	'section'		=> 'blog',
 	'default'		=> 'off',
 ) );
@@ -128,6 +128,88 @@ Kirki::add_field( 'dashwall_theme', array(
 		'step'	=> '1',
 	),
 ) );
+// Blog: Select Featured Posts Archive/Main Page
+Kirki::add_field( 'dashwall_theme', array(
+	'type'        => 'select',
+	'settings'    => 'featured-page',
+	'label'       => esc_html__( 'Select Featured Posts Page', 'dashwall' ),
+	'description' => esc_html__( 'Choose a page to link to from the featured posts section', 'dashwall' ),
+	'section'     => 'blog',
+	'default'     => '',
+	'choices'     => get_page_choices(), 
+	'priority'    => 10,
+) );
+// Blog: Featured Button Text
+Kirki::add_field( 'dashwall_theme', array(
+	'type'        => 'text',
+	'settings'    => 'featured-button-text',
+	'label'       => esc_html__( 'Featured Posts Button Text', 'dashwall' ),
+	'description' => esc_html__( 'Set the text for the button in the Featured posts section', 'dashwall' ),
+	'section'     => 'blog',
+	'default'     => 'Featured Pages',
+	'priority'    => 10,
+) );
+// Blog: Button Text Color
+Kirki::add_field( 'dashwall_theme', array(
+	'type'        => 'color',
+	'settings'    => 'featured-button-text-color',
+	'label'       => esc_html__( 'Button Text Color', 'dashwall' ),
+	'section'     => 'blog',
+	'default'     => '#ffffff',
+) );
+
+// Blog: Button Gradient Color 1
+Kirki::add_field( 'dashwall_theme', array(
+	'type'        => 'color',
+	'settings'    => 'featured-button-gradient-color1',
+	'label'       => esc_html__( 'Button Gradient Color 1', 'dashwall' ),
+	'section'     => 'blog',
+	'default'     => '#ff7e5f',
+) );
+
+// Blog: Button Gradient Color 2
+Kirki::add_field( 'dashwall_theme', array(
+	'type'        => 'color',
+	'settings'    => 'featured-button-gradient-color2',
+	'label'       => esc_html__( 'Button Gradient Color 2', 'dashwall' ),
+	'section'     => 'blog',
+	'default'     => '#feb47b',
+) );
+
+// Blog: Button Hover Text Color
+Kirki::add_field( 'dashwall_theme', array(
+	'type'        => 'color',
+	'settings'    => 'featured-button-hover-text-color',
+	'label'       => esc_html__( 'Button Hover Text Color', 'dashwall' ),
+	'section'     => 'blog',
+	'default'     => '#99003d',
+) );
+// Add a separator
+Kirki::add_field( 'dashwall_theme', [
+    'type'        => 'custom',
+    'settings'    => 'separator-featured',
+    'section'     => 'blog',
+    'default'     => '<hr />',
+] );
+// Blog: Highlight Posts Exclude
+Kirki::add_field( 'dashwall_theme', array(
+	'type'        => 'switch',
+	'settings'    => 'highlight-posts-exclude',
+	'label'       => esc_html__( 'Highlight Posts Exclude', 'dashwall' ),
+	'description' => esc_html__( 'Exclude highlight posts from the content below', 'dashwall' ),
+	'section'     => 'blog',
+	'default'     => 'off',
+) );
+// Blog: Highlight Section Title
+Kirki::add_field( 'dashwall_theme', array(
+	'type'        => 'text',
+	'settings'    => 'highlight-section-title',
+	'label'       => esc_html__( 'Highlight Section Title', 'dashwall' ),
+	'description' => esc_html__( 'Change the title for the Highlight section', 'dashwall' ),
+	'section'     => 'blog',
+	'default'     => esc_html__( 'Highlights', 'dashwall' ),
+	'placeholder' => esc_html__( 'Enter section title', 'dashwall' ),
+) );
 // Blog: Highlight Category
 Kirki::add_field( 'dashwall_theme', array(
 	'type'			=> 'select',
@@ -153,6 +235,69 @@ Kirki::add_field( 'dashwall_theme', array(
 		'step'	=> '1',
 	),
 ) );
+// Blog: Select Highlights Posts Archive/Main Page
+Kirki::add_field( 'dashwall_theme', array(
+	'type'        => 'select',
+	'settings'    => 'highlights-page',
+	'label'       => esc_html__( 'Select Highlights Posts Page', 'dashwall' ),
+	'description' => esc_html__( 'Choose a page to link to from the highlights section', 'dashwall' ),
+	'section'     => 'blog',
+	'default'     => '',
+	'choices'     => get_page_choices(), 
+	'priority'    => 10,
+) );
+// Blog: Highlights Button Text
+Kirki::add_field( 'dashwall_theme', array(
+	'type'        => 'text',
+	'settings'    => 'highlight-button-text',
+	'label'       => esc_html__( 'Highlights Button Text', 'dashwall' ),
+	'description' => esc_html__( 'Set the text for the button in the Highlights section', 'dashwall' ),
+	'section'     => 'blog',
+	'default'     => 'View More Highlights',
+	'priority'    => 10,
+) );
+// Highlights: Button Text Color
+Kirki::add_field( 'dashwall_theme', array(
+	'type'        => 'color',
+	'settings'    => 'highlights-button-text-color',
+	'label'       => esc_html__( 'Highlights Button Text Color', 'dashwall' ),
+	'section'     => 'blog', // or your correct section
+	'default'     => '#000080', // Ashoka Chakra Blue
+) );
+
+// Highlights: Button Gradient Color 1
+Kirki::add_field( 'dashwall_theme', array(
+	'type'        => 'color',
+	'settings'    => 'highlights-button-gradient-color-top',
+	'label'       => esc_html__( 'Highlights Button Gradient Top', 'dashwall' ),
+	'section'     => 'blog',
+	'default'     => '#ff9933', // Saffron
+) );
+
+// Highlights: Button Gradient Color 2
+Kirki::add_field( 'dashwall_theme', array(
+	'type'        => 'color',
+	'settings'    => 'highlights-button-gradient-color-bottom',
+	'label'       => esc_html__( 'Highlights Button Gradient Bottom', 'dashwall' ),
+	'section'     => 'blog',
+	'default'     => '#138808', // Green
+) );
+
+// Highlights: Button Hover Shadow Color
+Kirki::add_field( 'dashwall_theme', array(
+	'type'        => 'color',
+	'settings'    => 'highlights-button-hover-shadow-color',
+	'label'       => esc_html__( 'Highlights Button Hover Shadow Color', 'dashwall' ),
+	'section'     => 'blog',
+	'default'     => '#ffdf00', // Golden hover glow
+) );
+// Add a separator
+Kirki::add_field( 'dashwall_theme', [
+    'type'        => 'custom',
+    'settings'    => 'separator-highlights',
+    'section'     => 'blog',
+    'default'     => '<hr />',
+] );
 // Blog: Recent Comments
 Kirki::add_field( 'dashwall_theme', array(
 	'type'			=> 'switch',
